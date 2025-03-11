@@ -1,0 +1,113 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos para o body */
+body {
+  font-family: sans-serif;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+html.dark body {
+  background-color: #1f2937;
+}
+
+/* Container centralizado */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 50vh;
+  padding: 2rem;
+}
+
+/* Estilização do label */
+label {
+  display: none;
+  width: 70%;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+html.dark label {
+  color: #ffffff;
+}
+h1 {
+  display: block;
+  font-size: 2rem;
+}
+html.dark h1 {
+  color: #ffffff;
+  padding: 10vh;
+}
+
+/* Estilização do input de arquivo */
+input[type="file"] {
+  display: block;
+  width: 70%;
+  font-size: 1rem;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark input[type="file"] {
+  color: #9ca3af;
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+/* Estilização do botão do input (file selector) */
+input[type="file"]::file-selector-button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #3b82f6;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: #2563eb;
+}
+
+html.dark input[type="file"]::file-selector-button {
+  background-color: #2563eb;
+}
+
+html.dark input[type="file"]::file-selector-button:hover {
+  background-color: #1d4ed8;
+}
+
+input[type="file"]:focus {
+  outline: none;
+}
+
+#output {
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+html.dark #output {
+  color: #ffffff;
+}

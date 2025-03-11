@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Extractor</title>
+   
+    
+    <script>
+        const storedTheme = localStorage.getItem('color-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+
+        if (storedTheme === 'dark' || (!storedTheme && prefersDark.matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+        // Atualiza o tema automaticamente se o usuário mudar a preferência do sistema
+        prefersDark.addEventListener('change', function(e) {
+            if (e.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+    </script>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body >
+    
+    <div class="container">
+        <h1 >Selecione um histórico para calcular o IRA</h1>
+        <label for="pdfInput"> <p>Upload file</p></label>
+        <input id="pdfInput" accept="application/pdf" type="file">
+
+    </div>
+
+    <!-- <input type="file" id="pdfInput" accept="application/pdf" /> 
+    <button class="block " onclick="extractText()">Extrair Texto</button>-->
+    <pre id="output"></pre>
+
+     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+
+    <script>
+            const fileInput = document.getElementById('pdfInput');
+            fileInput.addEventListener('change', () => {
+                extractText()
+            });
+            async function extractText() {
+            
+            const fileInput = document.getElementById('pdfInput');
+            if (fileInput.files.length === 0) {
+                alert('Por favor, selecione um arquivo PDF.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const fileReader = new FileReader();
+            cargaHorariaToral = 0;
+            cargaHorariaTrancadas = 0;
+            disciplinas = {
+                periodo: [],
+                cargaHoraria: [],
+                nota: [],
+                status: []
+            };
+
+            fileReader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+
+                // Carregar o PDF com pdfjs-dist
+                const loadingTask = pdfjsLib.getDocument(typedarray);
+                const pdf = await loadingTask.promise;
+                
+                //let text = '';
+                let disciplina = [];
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    
+                    textArray = content.items.map(item => item.str);
+                    let initHistorico = false;
+                    
+                    textArray.forEach(element => {
+                        if (element === "Componentes Curriculares Cursados/Cursando"){
+                            initHistorico = true;
+                        }
+                        
+                        if (initHistorico) {
+                            
+                            disciplina.push(element);
+
+                            if(element.split(" ")[0] === "Docente(s):"){
+                                
+                                if(['*','e', '&','#', '@', '§'].includes(disciplina.slice(-4)[1])){
+                                    //text += "Período: " + disciplina.slice(-10)[0]+ "\n";
+                                    //text += "Disciplina: " + disciplina.slice(-10)[1]+ "\n";
+                                    //text += "Situação: " + disciplina.slice(-10)[3]+ "\n";
+                                    //text += "Nota: " + disciplina.slice(-10)[6]+ "\n";
+                                    //text += "Carga Horária: " + disciplina.slice(-10)[8]+ "\n";
+                                    //text += "-----------------\n"
+
+                                    disciplinas.periodo.push(disciplina.slice(-10)[0]);
+                                    disciplinas.cargaHoraria.push(disciplina.slice(-10)[8]);
+                                    disciplinas.nota.push(disciplina.slice(-10)[6]);
+                                    disciplinas.status.push(disciplina.slice(-10)[3]);
+
+                                }
+                                else {
+                                    //text += "Período: " + disciplina.slice(-9)[0]+ "\n";
+                                    //text += "Disciplina: " + disciplina.slice(-9)[1]+ "\n";
+                                    //text += "Situação: " + disciplina.slice(-9)[3]+ "\n";
+                                    //text += "Nota: " + disciplina.slice(-9)[6]+ "\n";
+                                    //text += "Carga Horária: " + disciplina.slice(-9)[7]+ "\n";
+                                    //text += "-----------------\n"
+
+                                    disciplinas.periodo.push(disciplina.slice(-9)[0]);
+                                    disciplinas.cargaHoraria.push(disciplina.slice(-9)[7]);
+                                    disciplinas.nota.push(disciplina.slice(-9)[6]);
+                                    disciplinas.status.push(disciplina.slice(-9)[3]);
+
+                                }
+
+                                disciplina = [];
+
+                            }
+                            
+                        }
+                    });
+                    
+                }
+                numerador = 0;
+                denominador = 0;
+                for (let i = 0; i < disciplinas.periodo.length;i++){
+                    if (disciplinas.status[i] === 'MATRICULADO' || disciplinas.status[i] === 'SUPRIMIDO'){}
+                    else if (disciplinas.status[i] === 'TRANCADO'){
+                        cargaHorariaToral += parseInt(disciplinas.cargaHoraria[i]);
+                        cargaHorariaTrancadas += parseInt(disciplinas.cargaHoraria[i]);
+                    }
+                    else {
+                        cargaHorariaToral += parseInt(disciplinas.cargaHoraria[i]);
+                        Pi = Math.min(6, parseInt(disciplinas.periodo[i].split(".")[0] - disciplinas.periodo[0].split(".")[0])*2 + parseInt(disciplinas.periodo[i].split(".")[1]));
+                        Ci = parseInt(disciplinas.cargaHoraria[i]); 
+                        Ni = parseInt(disciplinas.nota[i].split(".")[0] + disciplinas.nota[i].split(".")[1]);
+                        console.log(i + ": Pi: " + Pi + " | Ci: "  + Ci + " | Ni: " + Ni);
+                        numerador += Pi*Ci*Ni;
+                        denominador += Pi*Ci;
+                    }
+
+                }
+                IRA = (1 - ((0.5*cargaHorariaTrancadas)/cargaHorariaToral)) * (numerador/denominador) / 10;
+                console.log(IRA);
+                document.getElementById('output').textContent = "IRA calculado é " + IRA.toString().substring(0,5) + " ± 0.01";
+            };
+
+            fileReader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>
