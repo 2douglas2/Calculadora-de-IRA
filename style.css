@@ -44,11 +44,12 @@ label {
 html.dark label {
   color: #ffffff;
 }
-h1 {
+#titulo {
   display: block;
-  font-size: 2rem;
+  font-size: clamp(24px, 5vw, 48px);
+  text-align: center;
 }
-html.dark h1 {
+html.dark #titulo {
   color: #ffffff;
   padding: 10vh;
 }
@@ -102,12 +103,54 @@ input[type="file"]:focus {
 }
 
 #output {
-  margin-top: 0;
-  font-size: 2rem;
   font-weight: 500;
+  padding-top: 2rem;
   color: #1f2937;
+  font-size: 1.2rem; 
+  line-height: 1.6;
+  text-align: justify;
+  margin: 0 10%;
 }
 
 html.dark #output {
   color: #ffffff;
 }
+
+
+#seleciona-curso {
+  display: block;
+}
+
+.botao-geral {
+  display: block;
+  padding: 0.5rem 1rem;
+  margin-left: 3rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #3b82f6;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.botao-geral:hover {
+  background-color: #2563eb;
+}
+
+html.dark .botao-geral {
+  background-color: #2563eb;
+}
+
+html.dark .botao-geral:hover {
+  background-color: #1d4ed8;
+}
+
+.IRA-geral {
+  display: none;
+  align-items: baseline;
+  justify-content: center;
+  width: 100vw;
+  height: 50vh;
+  padding: 2rem;
+}
+

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="pt-br" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Extractor</title>
+    <title>Calculadora de IRA</title>
    
     
     <script>
@@ -32,25 +32,35 @@
 <body >
     
     <div class="container">
-        <h1 >Selecione um histórico para calcular o IRA</h1>
+        <h1 id="titulo" >Selecione um histórico para calcular o IRA</h1>
         <label for="pdfInput"> <p>Upload file</p></label>
         <input id="pdfInput" accept="application/pdf" type="file">
-
+        <p id="output"></p>
     </div>
 
-    <!-- <input type="file" id="pdfInput" accept="application/pdf" /> 
-    <button class="block " onclick="extractText()">Extrair Texto</button>-->
-    <pre id="output"></pre>
+    
 
-     
+    <div class="IRA-geral">
+        <label for="seleciona-curso">Previsão aproximada do IRA geral</label>
+        <select id="seleciona-curso" class="select-responsivo">
+            <option value="1">Eng. de Computação</option>
+            <option value="2">Eng. de Telecomunicações</option>
+            <option value="0">Outro</option>
+        </select>
+    
+        
+        <button class="botao-geral" onclick="extractText()">Prever</button>
+    </div>
+    
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
 
     <script>
             const fileInput = document.getElementById('pdfInput');
             fileInput.addEventListener('change', () => {
-                extractText()
+                calculaIRA()
             });
-            async function extractText() {
+            async function calculaIRA() {
             
             const fileInput = document.getElementById('pdfInput');
             if (fileInput.files.length === 0) {
@@ -136,7 +146,7 @@
                 numerador = 0;
                 denominador = 0;
                 for (let i = 0; i < disciplinas.periodo.length;i++){
-                    if (disciplinas.status[i] === 'MATRICULADO' || disciplinas.status[i] === 'SUPRIMIDO'){}
+                    if (disciplinas.status[i] === 'MATRICULADO' || disciplinas.status[i] === 'SUPRIMIDO' || disciplinas.status[i] === 'APROVT INTERNO'){}
                     else if (disciplinas.status[i] === 'TRANCADO'){
                         cargaHorariaToral += parseInt(disciplinas.cargaHoraria[i]);
                         cargaHorariaTrancadas += parseInt(disciplinas.cargaHoraria[i]);
@@ -154,7 +164,8 @@
                 }
                 IRA = (1 - ((0.5*cargaHorariaTrancadas)/cargaHorariaToral)) * (numerador/denominador) / 10;
                 console.log(IRA);
-                document.getElementById('output').textContent = "IRA calculado é " + IRA.toString().substring(0,5) + " ± 0.01";
+                document.getElementById('output').textContent = "IRA Individual: " + IRA.toString().substring(0,5);
+                document.getElementById('titulo').style.display = 'none';
             };
 
             fileReader.readAsArrayBuffer(file);
