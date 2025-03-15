@@ -14,7 +14,7 @@
         if (storedTheme === 'dark' || (!storedTheme && prefersDark.matches)) {
             document.documentElement.classList.add('dark');
         } else {
-            document.documentElement.classList.remove('dark')
+            document.documentElement.classList.remove('dark');
         }
         // Atualiza o tema automaticamente se o usuário mudar a preferência do sistema
         prefersDark.addEventListener('change', function(e) {
@@ -40,29 +40,32 @@
 
     
 
-    <div class="IRA-geral">
-        <label for="seleciona-curso">Previsão aproximada do IRA geral</label>
-        <select id="seleciona-curso" class="select-responsivo">
-            <option value="1">Eng. de Computação</option>
-            <option value="2">Eng. de Telecomunicações</option>
-            <option value="0">Outro</option>
-        </select>
-    
+    <div id="IRA-geral">
+        <div id = "area-selecionar-curso">
+            <label for="seleciona-curso">Previsão aproximada do IRA geral</label>
+            <select id="seleciona-curso" class="select-responsivo">
+                <option value="" selected disabled>Selecione seu curso</option>
+                <option value="7.02481238,1.94672856,0.63">Eng. de Computação</option>
+                <option value="5.79540738,1.93408195,0.87">Eng. de Telecomunicações</option>
+                <option value="0">Outro</option>
+            </select>
         
-        <button class="botao-geral" onclick="extractText()">Prever</button>
+            <button id="botao-geral" onclick="preveIRAGeral()">Prever</button>
+        </div>
+        <p id="output2"></p>
     </div>
     
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
 
     <script>
-            const fileInput = document.getElementById('pdfInput');
-            fileInput.addEventListener('change', () => {
-                calculaIRA()
-            });
-            async function calculaIRA() {
-            
-            const fileInput = document.getElementById('pdfInput');
+        const fileInput = document.getElementById('pdfInput');
+        IRA = 0;
+        IRAGeral = 0;
+        fileInput.addEventListener('change', () => {
+            calculaIRA()
+        });
+        async function calculaIRA() {
             if (fileInput.files.length === 0) {
                 alert('Por favor, selecione um arquivo PDF.');
                 return;
@@ -106,37 +109,19 @@
 
                             if(element.split(" ")[0] === "Docente(s):"){
                                 
-                                if(['*','e', '&','#', '@', '§'].includes(disciplina.slice(-4)[1])){
-                                    //text += "Período: " + disciplina.slice(-10)[0]+ "\n";
-                                    //text += "Disciplina: " + disciplina.slice(-10)[1]+ "\n";
-                                    //text += "Situação: " + disciplina.slice(-10)[3]+ "\n";
-                                    //text += "Nota: " + disciplina.slice(-10)[6]+ "\n";
-                                    //text += "Carga Horária: " + disciplina.slice(-10)[8]+ "\n";
-                                    //text += "-----------------\n"
-
+                                if(['*','e', '&','#', '@', '§'].includes(disciplina.slice(-4)[1])){                                    
                                     disciplinas.periodo.push(disciplina.slice(-10)[0]);
                                     disciplinas.cargaHoraria.push(disciplina.slice(-10)[8]);
                                     disciplinas.nota.push(disciplina.slice(-10)[6]);
                                     disciplinas.status.push(disciplina.slice(-10)[3]);
-
                                 }
                                 else {
-                                    //text += "Período: " + disciplina.slice(-9)[0]+ "\n";
-                                    //text += "Disciplina: " + disciplina.slice(-9)[1]+ "\n";
-                                    //text += "Situação: " + disciplina.slice(-9)[3]+ "\n";
-                                    //text += "Nota: " + disciplina.slice(-9)[6]+ "\n";
-                                    //text += "Carga Horária: " + disciplina.slice(-9)[7]+ "\n";
-                                    //text += "-----------------\n"
-
                                     disciplinas.periodo.push(disciplina.slice(-9)[0]);
                                     disciplinas.cargaHoraria.push(disciplina.slice(-9)[7]);
                                     disciplinas.nota.push(disciplina.slice(-9)[6]);
                                     disciplinas.status.push(disciplina.slice(-9)[3]);
-
                                 }
-
                                 disciplina = [];
-
                             }
                             
                         }
@@ -166,9 +151,33 @@
                 console.log(IRA);
                 document.getElementById('output').textContent = "IRA Individual: " + IRA.toString().substring(0,5);
                 document.getElementById('titulo').style.display = 'none';
+                document.getElementById('IRA-geral').style.display = 'flex';
             };
-
             fileReader.readAsArrayBuffer(file);
+        }
+        async function preveIRAGeral() {
+            valores = document.getElementById('seleciona-curso').value
+            if (valores === "") {
+                alert('Por favor, selecione um curso.');
+                return;
+            }
+            if (valores === '0') {
+                alert('Por enquanto não temos suporte para outros cursos.');
+                return;
+            }
+
+            media = parseFloat(valores.split(',')[0]);
+            desvio = parseFloat(valores.split(',')[1]);
+            erro = valores.split(',')[2];
+
+            IRAGeral = 6 + (2*((IRA-media)/(desvio)));
+
+            IRAGeral = IRAGeral < 0 ? 0 : IRAGeral;
+            IRAGeral = IRAGeral > 10 ? 10 : IRAGeral;
+
+            console.log(IRAGeral);
+            document.getElementById('output2').textContent = "Previsão do IRA geral: " + IRAGeral.toString().substring(0,5) + "±" + erro;
+            
         }
     </script>
 </body>
